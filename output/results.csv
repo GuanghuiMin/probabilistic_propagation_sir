@@ -1,0 +1,13 @@
+Metric,Value
+Monte Carlo Time (s),55.25787281990051
+Ground Truth Time (s),0.015956640243530273
+Approximation Time (s),0.014322757720947266
+MC Average Convergence Steps,44.948
+GT Convergence Steps,51.0
+Approximation Convergence Steps,52.0
+GT Final S Percentile,34.4
+Approx Final S Percentile,34.4
+GT Kendall-Tau,0.8711864406779662
+GT p-value,4.1491983847475005e-18
+Approx Kendall-Tau,0.869491525423729
+Approx p-value,4.811796356542234e-18
