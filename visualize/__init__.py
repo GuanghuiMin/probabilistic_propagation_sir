@@ -4,13 +4,14 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import os
 
+
 def visualize_pyg_graph(pyg_graph, subgraph_size=500, save=False, filename="subgraph.png"):
     subgraph_nodes = list(range(subgraph_size))
     subgraph_nodes = torch.tensor(subgraph_nodes, device=pyg_graph.edge_index.device)
-    
+
     mask = torch.isin(pyg_graph.edge_index[0, :], subgraph_nodes) & \
            torch.isin(pyg_graph.edge_index[1, :], subgraph_nodes)
-    
+
     subgraph_edge_index = pyg_graph.edge_index[:, mask]
 
     subgraph = nx.DiGraph()
@@ -30,12 +31,13 @@ def visualize_pyg_graph(pyg_graph, subgraph_size=500, save=False, filename="subg
     plt.show()
 
 
-def plot_results(mc_s_trajectories, ground_truth_s, approx_exp_s, nodes, output_dir="./figures"):
+def plot_results(mc_s_trajectories, ground_truth_s, approx_exp_s, sor_exp_s, nodes, output_dir="./figures"):
     """Plot trajectories and save the figure."""
     max_length = max(
         max(len(trajectory) for trajectory in mc_s_trajectories),
         len(ground_truth_s),
-        len(approx_exp_s)
+        len(approx_exp_s),
+        len(sor_exp_s)
     )
     mc_s_trajectories_padded = [
         trajectory + [trajectory[-1]] * (max_length - len(trajectory)) for trajectory in mc_s_trajectories
@@ -50,9 +52,12 @@ def plot_results(mc_s_trajectories, ground_truth_s, approx_exp_s, nodes, output_
     for trajectory in mc_s_trajectories_padded:
         plt.plot(trajectory, color='gray', alpha=0.2)
     plt.plot(mean_s, color='blue', label='MC Mean S', linewidth=2)
-    plt.fill_between(range(len(mean_s)), lower_bound, upper_bound, color='blue', alpha=0.3, label='95% Confidence Interval')
+    plt.fill_between(range(len(mean_s)), lower_bound, upper_bound, color='blue', alpha=0.3,
+                     label='95% Confidence Interval')
     plt.plot(ground_truth_s, color='green', label='Ground Truth S', linewidth=2)
     plt.plot(approx_exp_s, color='red', label='Approx Exp S', linewidth=2)
+    plt.plot(sor_exp_s, color='orange', label='SOR Exp S', linewidth=2)
+
     plt.xlabel('Iterations')
     plt.ylabel('Number of Susceptible Individuals')
     plt.title('SIR Model: Susceptible (S) State Trajectories, Mean, and Confidence Interval')
@@ -64,5 +69,3 @@ def plot_results(mc_s_trajectories, ground_truth_s, approx_exp_s, nodes, output_
     os.makedirs(output_dir, exist_ok=True)
     plt.savefig(os.path.join(output_dir, "sir_trajectories.png"))
     plt.close()
-
-
