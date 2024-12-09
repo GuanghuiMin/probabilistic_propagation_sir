@@ -20,10 +20,10 @@ def main(args):
         data = generate_pyg_graph(args.graph_type, nodes=args.nodes)
     else:
         data = load_external_dataset(args.dataset)
-    initial_infected_nodes = torch.tensor(
-        np.random.choice(args.nodes, args.initial_infected, replace=False), device='cuda'
-    )
     num_nodes = data.num_nodes
+    initial_infected_nodes = torch.tensor(
+        np.random.choice(num_nodes, args.initial_infected, replace=False), device='cuda'
+    )
 
     max_in_degree, two_norm, spectral_radius = calculate_graph_properties(data)
     print(
