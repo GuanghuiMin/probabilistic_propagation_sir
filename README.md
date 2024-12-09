@@ -27,6 +27,7 @@ Specificlly, for installation of `torch` and `PyG`:
 pip install https://download.pytorch.org/whl/cu118/torch-2.4.1%2Bcu118-cp310-cp310-linux_x86_64.whl#sha256=740bae6eb10c6b41cb86c4f9e84da0b4533b5595aed4f06694d95d5e32b4076c
 pip install pyg-lib -f https://data.pyg.org/whl/torch-2.4.0+cu118.html
 pip install torch-geometric
+pip install torch-scatter==2.1.2 -f https://data.pyg.org/whl/torch-2.4.1+cu118.html
 ```
 
 ## Execution
@@ -50,19 +51,24 @@ After execution of the code, there will generate a folder containing a trajector
 and a `.csv` table looks like
 
 ```
-                             Metric         Value
-0              Monte Carlo Time (s)  5.702568e+01
-1             Ground Truth Time (s)  2.435303e-02
-2            Approximation Time (s)  2.206039e-02
-3      MC Average Convergence Steps  4.581400e+01
-4              GT Convergence Steps  7.500000e+01
-5   Approximation Convergence Steps  7.600000e+01
-6             GT Final S Percentile  3.040000e+01
-7         Approx Final S Percentile  3.040000e+01
-8                    GT Kendall-Tau  8.372881e-01
-9                        GT p-value  7.614124e-17
-10               Approx Kendall-Tau  8.423729e-01
-11                   Approx p-value  4.956615e-17
+                          Metric         Value
+0           Monte Carlo Time (s)  3.509154e+00
+1          Ground Truth Time (s)  5.710840e-03
+2         Approximation Time (s)  4.809856e-03
+3            SOR Approx Time (s)  3.976583e-03
+4   MC Average Convergence Steps  6.578000e+00
+5           GT Convergence Steps  1.800000e+01
+6       Approx Convergence Steps  1.800000e+01
+7          SOR Convergence Steps  1.400000e+01
+8          GT Final S Percentile  3.800000e+00
+9      Approx Final S Percentile  3.800000e+00
+10        SOR Final S Percentile  1.180000e+01
+11                GT Kendall-Tau  8.219331e-01
+12                    GT p-value  3.294221e-16
+13            Approx Kendall-Tau  8.202331e-01
+14                Approx p-value  3.787947e-16
+15               SOR Kendall-Tau  8.219331e-01
+16                   SOR p-value  3.294221e-16
 ```
 
 which reveal our analysis of result.
