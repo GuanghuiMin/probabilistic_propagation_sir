@@ -44,7 +44,7 @@ Options for arguments can be accessed in `main.py`.
 
 ## Results
 
-After execution of the code, there will generate a folder containing a trajectory plot
+After execution of the code, there will be a folder `./output` containing a trajectory plot
 
 ![sir_trajectories](./output/sir_trajectories.png)
 
