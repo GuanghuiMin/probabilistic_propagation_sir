@@ -78,5 +78,5 @@ which reveal our analysis of result.
 ## To-do List
 
 - [x] Change Monte Carlo simulation to multi-thread processing.
-- [ ] Implement on large directed networks.
+- [x] Implement on large directed networks.
 - [ ] Explore on the effect of initial infected set.

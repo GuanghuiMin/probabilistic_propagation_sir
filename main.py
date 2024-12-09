@@ -5,10 +5,9 @@ import torch.multiprocessing as mp
 import time
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
 from networks import generate_pyg_graph
-from simulations.mc_multiprocess import run_monte_carlo, worker
-from utils import calculate_graph_properties, calculate_infection_probability
+from simulations.mc_multiprocess import worker
+from utils import calculate_graph_properties, calculate_infection_probability, load_external_dataset
 from eval import compare_mc_and_ranking
 from visualize import plot_results
 from simulations.pps import conditional_probability_iteration
@@ -17,10 +16,14 @@ from simulations.aapps import sor_approx_conditional_probability_iteration_exp
 
 
 def main(args):
-    data = generate_pyg_graph(args.graph_type, nodes=args.nodes)
+    if args.dataset.strip() == "":
+        data = generate_pyg_graph(args.graph_type, nodes=args.nodes)
+    else:
+        data = load_external_dataset(args.dataset)
     initial_infected_nodes = torch.tensor(
         np.random.choice(args.nodes, args.initial_infected, replace=False), device='cuda'
     )
+    num_nodes = data.num_nodes
 
     max_in_degree, two_norm, spectral_radius = calculate_graph_properties(data)
     print(
@@ -87,14 +90,20 @@ def main(args):
     approx_final_s = approx_exp_s[-1]
     sor_final_s = sor_exp_s[-1]
 
+    # Monte Carlo最终S估计（各次模拟最后的S值）
     mc_final_s = [trajectory[-1] if isinstance(trajectory[-1], (int, float)) else sum(trajectory[-1]) for trajectory in
                   all_trajectories]
+    mc_s_estimate = np.mean(mc_final_s)
+
+    # 非参数95%置信区间(使用百分位数)
+    mc_s_lower_ci = np.percentile(mc_final_s, 2.5)
+    mc_s_upper_ci = np.percentile(mc_final_s, 97.5)
 
     gt_percentile = np.sum(np.array(mc_final_s) < gt_final_s) / len(mc_final_s) * 100
     approx_percentile = np.sum(np.array(mc_final_s) < approx_final_s) / len(mc_final_s) * 100
     sor_percentile = np.sum(np.array(mc_final_s) < sor_final_s) / len(mc_final_s) * 100
 
-    plot_results(all_trajectories, ground_truth_s, approx_exp_s, sor_exp_s, args.nodes, args.output_dir)
+    plot_results(all_trajectories, ground_truth_s, approx_exp_s, sor_exp_s, num_nodes, args.output_dir)
 
     data_dict = {
         "Metric": [
@@ -114,7 +123,13 @@ def main(args):
             "Approx Kendall-Tau",
             "Approx p-value",
             "SOR Kendall-Tau",
-            "SOR p-value"
+            "SOR p-value",
+            "MC Final S Estimate",
+            "MC Final S Lower CI (95%)",
+            "MC Final S Upper CI (95%)",
+            "GT Final S",
+            "Approx Final S",
+            "SOR Final S"
         ],
         "Value": [
             mc_time,
@@ -133,7 +148,13 @@ def main(args):
             approx_tau,
             approx_p_value,
             sor_tau,
-            sor_p_value
+            sor_p_value,
+            mc_s_estimate,
+            mc_s_lower_ci,
+            mc_s_upper_ci,
+            gt_final_s,
+            approx_final_s,
+            sor_final_s
         ]
     }
     results_table = pd.DataFrame(data_dict)
@@ -145,12 +166,15 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run SIR model simulations.")
     parser.add_argument("--graph_type", type=str, default="er", help="Graph type (e.g., ba, er, powerlaw, smallworld)")
     parser.add_argument("--nodes", type=int, default=50, help="Number of nodes in the graph")
-    parser.add_argument("--beta", type=float, default=0.03, help="Infection rate")
-    parser.add_argument("--gamma", type=float, default=0.5, help="Recovery rate")
+    parser.add_argument("--beta", type=float, default=1 / 18, help="Infection rate")
+    parser.add_argument("--gamma", type=float, default=1 / 9, help="Recovery rate")
     parser.add_argument("--omega", type=float, default=1.3, help="Relaxtion rate")
     parser.add_argument("--tol", type=float, default=1e-3, help="Tolerance for convergence")
     parser.add_argument("--num_simulations", type=int, default=500, help="Number of Monte Carlo simulations")
-    parser.add_argument("--initial_infected", type=int, default=10, help="Number of initially infected nodes")
+    parser.add_argument("--initial_infected", type=int, default=500, help="Number of initially infected nodes")
     parser.add_argument("--output_dir", type=str, default="./output", help="Directory to save figures and results")
+    parser.add_argument("--dataset", type=str, default="",
+                        help="Path to an external dataset file (if empty, use graph_type)")
+
     args = parser.parse_args()
     main(args)
