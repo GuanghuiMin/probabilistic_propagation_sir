@@ -2,17 +2,23 @@ import torch
 from scipy.stats import kendalltau
 
 
-
 def compare_mc_and_ranking(results_exp, infection_probability):
     """Analyze results using Kendall-Tau correlation."""
     last_iteration = results_exp[-1]
+
     recovered_prob = torch.tensor(
-        [last_iteration['recovered'][node] for node in range(len(infection_probability))],
+        [
+            last_iteration['recovered'][node] + last_iteration['infected'][node]
+            for node in range(len(infection_probability))
+        ],
         device='cuda'
     )
+
     infection_probability_cpu = infection_probability.cpu().numpy()
     recovered_prob_cpu = recovered_prob.cpu().numpy()
+
     tau, p_value = kendalltau(infection_probability_cpu, recovered_prob_cpu)
+
     return tau, p_value
 
 

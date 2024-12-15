@@ -1,18 +1,30 @@
 Metric,Value
-Monte Carlo Time (s),3.5091540813446045
-Ground Truth Time (s),0.0057108402252197266
-Approximation Time (s),0.004809856414794922
-SOR Approx Time (s),0.003976583480834961
-MC Average Convergence Steps,6.578
-GT Convergence Steps,18.0
-Approx Convergence Steps,18.0
-SOR Convergence Steps,14.0
-GT Final S Percentile,3.8
-Approx Final S Percentile,3.8
-SOR Final S Percentile,11.799999999999999
-GT Kendall-Tau,0.8219330889006672
-GT p-value,3.29422082147596e-16
-Approx Kendall-Tau,0.8202331238770877
-Approx p-value,3.7879466575197238e-16
-SOR Kendall-Tau,0.8219330889006672
-SOR p-value,3.29422082147596e-16
+Monte Carlo Time (s),85.87471723556519
+Ground Truth Time (s),0.033335208892822266
+Approximation Time (s),0.02951335906982422
+SOR Time (s),0.02105402946472168
+Local Push Approx Time (s),0.016493558883666992
+MC Average Convergence Steps,30.94
+GT Convergence Steps,83.0
+Approx Convergence Steps,83.0
+SOR Convergence Steps,65.0
+Local Push Convergence Steps,3.0
+GT Final S Percentile,20.599999999999998
+Approx Final S Percentile,20.599999999999998
+SOR Final S Percentile,33.800000000000004
+Local Push Final S Percentile,92.0
+GT Kendall-Tau,0.8361358559033544
+GT p-value,1.7409594097096433e-84
+Approx Kendall-Tau,0.8361358559033544
+Approx p-value,1.7409594097096433e-84
+SOR Kendall-Tau,0.8361358559033544
+SOR p-value,1.7409594097096433e-84
+Local Push Kendall-Tau,0.7985120407127465
+Local Push p-value,9.481057255106551e-75
+MC Final S Estimate,487.086
+MC Final S Lower CI (95%),482.0
+MC Final S Upper CI (95%),490.0
+GT Final S,485.2123292684555
+Approx Final S,485.27125281095505
+SOR Final S,486.12620455026627
+Local Push Final S,489.6007318496704

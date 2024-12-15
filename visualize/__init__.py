@@ -31,7 +31,8 @@ def visualize_pyg_graph(pyg_graph, subgraph_size=500, save=False, filename="subg
     plt.show()
 
 
-def plot_results(mc_s_trajectories, ground_truth_s, approx_exp_s, sor_exp_s, nodes, output_dir="./figures"):
+def plot_results(mc_s_trajectories, ground_truth_s, approx_exp_s, sor_exp_s, local_push_exp_s, nodes,
+                 output_dir="./figures"):
     """Plot trajectories and save the figure."""
     max_length = max(
         max(len(trajectory) for trajectory in mc_s_trajectories),
@@ -57,13 +58,14 @@ def plot_results(mc_s_trajectories, ground_truth_s, approx_exp_s, sor_exp_s, nod
     plt.plot(ground_truth_s, color='green', label='Ground Truth S', linewidth=2)
     plt.plot(approx_exp_s, color='red', label='Approx Exp S', linewidth=2)
     plt.plot(sor_exp_s, color='orange', label='SOR Exp S', linewidth=2)
+    plt.plot(local_push_exp_s, color='black', label='Local Push Exp S', linewidth=3)
 
     plt.xlabel('Iterations')
     plt.ylabel('Number of Susceptible Individuals')
     plt.title('SIR Model: Susceptible (S) State Trajectories, Mean, and Confidence Interval')
     plt.legend()
     plt.grid(True)
-    plt.ylim([0, nodes])
+    # plt.ylim([0, nodes])
 
     # Save the figure
     os.makedirs(output_dir, exist_ok=True)
