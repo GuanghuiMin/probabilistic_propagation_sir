@@ -5,10 +5,8 @@ import networkx as nx
 import time
 from tqdm import tqdm
 
-
 def run_sir_simulation(data, beta, gamma, initial_infected_nodes, device):
     N = data.num_nodes
-
     susceptible = torch.ones(N, dtype=torch.bool, device=device)
     infected = torch.zeros(N, dtype=torch.bool, device=device)
     recovered = torch.zeros(N, dtype=torch.bool, device=device)
@@ -69,7 +67,7 @@ def run_monte_carlo(data, beta, gamma, initial_infected_nodes, num_simulations, 
     results_list = []
     mc_s_trajectories = []
     start_time = time.time()
-    for _ in tqdm(range(num_simulations), desc=f"Simulations on {device}"):
+    for _ in tqdm(range(num_simulations), desc=f"Simulations on {device}", position=device.index):
         results = run_sir_simulation(data, beta, gamma, initial_infected_nodes, device)
         s_trajectory = [sum(1 for state in result['status'].values() if state == 0) for result in results]
         mc_s_trajectories.append(s_trajectory)
@@ -79,19 +77,28 @@ def run_monte_carlo(data, beta, gamma, initial_infected_nodes, num_simulations, 
 
 
 def worker(rank, world_size, data, beta, gamma, initial_infected_nodes, total_simulations, return_dict):
-    device = torch.device(f'cuda:{rank}')
-    data = data.to(device)
-    sims_per_worker = total_simulations // world_size
-    if rank == world_size - 1:
-        sims_per_worker += total_simulations % world_size
+    try:
+        device = torch.device(f'cuda:{rank % torch.cuda.device_count()}')
+        data = data.to(device)  # 拷贝到当前设备
+        sims_per_worker = total_simulations // world_size
+        if rank == world_size - 1:
+            sims_per_worker += total_simulations % world_size
 
-    start = time.time()
-    results_list, mc_s_trajectories, mc_time = run_monte_carlo(
-        data, beta, gamma, initial_infected_nodes, sims_per_worker, device
-    )
-    end = time.time()
-    elapsed = end - start
-    return_dict[rank] = (results_list, mc_s_trajectories, mc_time, elapsed)
+        start = time.time()
+        results_list, mc_s_trajectories, mc_time = run_monte_carlo(
+            data, beta, gamma, initial_infected_nodes, sims_per_worker, device
+        )
+        elapsed = time.time() - start
+
+        # 确保数据可序列化
+        return_dict[rank] = (
+            [r for r in results_list],  # 序列化 results_list
+            [t for t in mc_s_trajectories],  # 序列化 trajectories
+            mc_time,
+            elapsed
+        )
+    except Exception as e:
+        print(f"Worker {rank} failed with error: {e}")
 
 
 if __name__ == "__main__":
@@ -114,8 +121,7 @@ if __name__ == "__main__":
 
     processes = []
     for rank in range(world_size):
-        p = mp.Process(target=worker, args=(
-        rank, world_size, data, beta, gamma, initial_infected_nodes, total_simulations, return_dict))
+        p = mp.Process(target=worker, args=(rank, world_size, data, beta, gamma, initial_infected_nodes, total_simulations, return_dict))
         p.start()
         processes.append(p)
 
@@ -136,4 +142,4 @@ if __name__ == "__main__":
     print("Monte Carlo simulations completed.")
     print(f"Total number of simulations: {len(all_results)}")
     print(f"Sum of all processes' compute times: {total_time:.2f} s")
-    print(f"Wall-clock time (approx): {total_elapsed / world_size:.2f} s per worker")
+    print(f"Wall-clock time (approx): {total_elapsed/world_size:.2f} s per worker")
