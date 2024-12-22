@@ -1,0 +1,109 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+venv/
+ENV/
+*.egg-info/
+dist/
+build/
+*.egg
+*.whl
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+*.cover
+*.py,cover
+.cache
+nosetests.xml
+coverage.xml
+*.log
+*.tmp
+*.gz
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Editor directories and files
+.vscode/
+.idea/
+*.iml
+*.sublime-project
+*.sublime-workspace
+
+# PyCharm
+*.idea/
+*.idea/**/
+*.idea/modules.xml
+*.idea/workspace.xml
+*.idea/usage.statistics.xml
+*.idea/assetWizardSettings.xml
+
+# Spyder
+.spyderproject
+.spyproject
+
+# Flask files
+instance/
+.pytest_cache/
+
+# Django files
+*.log
+*.pot
+*.pyc
+*.sqlite3
+*.mo
+
+# mypy
+.mypy_cache/
+
+# Bandit
+.bandit/
+
+# Local virtualenv
+venv/
+env/
+epidemics/
+
+# Sensitive information
+.env
+.env.local
+.settings
+
+# Temporary files
+*.swp
+*.swo
+*.tmp
+*.temp
+~*
+
+# Logs
+*.log
+
+# Profiling data
+.prof
+
+# Pyre type checker
+.pyre/
