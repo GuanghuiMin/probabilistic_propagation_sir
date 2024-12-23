@@ -86,6 +86,7 @@ instance/
 venv/
 env/
 epidemics/
+output/
 
 # Sensitive information
 .env
