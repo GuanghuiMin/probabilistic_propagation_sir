@@ -372,7 +372,7 @@ if __name__ == "__main__":
     parser.add_argument("--num_simulations", type=int, default=100, help="Number of Monte Carlo simulations")
     parser.add_argument("--initial_infected", type=int, default=10, help="Number of initially infected nodes")
     parser.add_argument("--data_dir", type=str, default="./data", help="Directory to load real data")
-    parser.add_argument("--file_name", default="soc-Epinions1.txt.gz", type=str,
+    parser.add_argument("--file_name", default="com-friendster.top5000.cmty.txt.gz", type=str,
                         help="File name of the real data")
     parser.add_argument("--output_dir", type=str, default="./output", help="Directory to save results")
 

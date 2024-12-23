@@ -22,7 +22,7 @@ pip install -r requirements.txt
 ```
 
 ## Parameters Setting 
-We conduct a thorough survey of parameters for various diseases, including the Nipah virus, Andes hantavirus, MERS, Ebola, Mpox, common cold, and pertussis. The parameters are summarized in the table below.
+We conduct a thorough survey of parameters for various diseases, including the Nipah virus, Andes hantavirus, MERS, Ebola, Mpox, common cold, and pertussis. The parameters are summarized in the table below. We use the parameters of Nipah Virus as the default setting. 
 
 | **Disease**              | **Infectious Period**                                                                     | **Transmission**                                   | **$R_0$**                                                                                                                                             | **$\gamma$ [1/day]** | **$\beta$ [1/day]** |
 |-------------------------|-------------------------------------------------------------------------------------------|--------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------|---------------------|
@@ -42,6 +42,26 @@ python main.py
 ```
 
 Options for arguments can be accessed in `main.py`.
+
+## Evaluation
+Run the following to evaluate the performance of the algorithm:
+
+```bash
+python evaluation.py
+```
+
+Arguments are same as `main.py`.
+
+The evaluation script will output the following metrics:
+
+| **Metrics**         | **Category**        | **Description and Calculation Method**                                            |
+|----------------------|---------------------|-----------------------------------------------------------------------------------|
+| **Ranking Metrics**  | Kendall-Tau Coefficient | Measures the rank correlation between two lists. Calculated using Kendall's Tau formula. |
+|                      | Top-k Overlap       | Measures the overlap between the top-k elements of two ranked lists.              |
+| **Error Metrics**    | Quantile in Simulations | Evaluates predicted probabilities' distribution within quantiles of simulation results. |
+|                      | Mean Squared Error (MSE) | Measures the average squared difference between predicted and true values.         |
+| **Efficiency Metrics** | Computation Time   | Total runtime required to complete the prediction or simulation process.          |
+|                      | Number of Iterations | The total number of iterations needed for convergence.                            |
 
 ## Synthetic Data Generation
 We try to generate synthetic different types of networks, including Erdos-Renyi, Barabasi-Albert, and Watts-Strogatz (small world). The code is in `networks/__init__.py`.
