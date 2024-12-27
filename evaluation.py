@@ -309,20 +309,19 @@ def main(args):
 
     method_summary = []
     num_nodes = len(graph)
-    mean_mc_infection_prob = np.mean(mc_infection_probs, axis=0)
 
-    print("[Info] Running various methods (3 trials each) ...")
     for method_name, method_func in methods.items():
         print(f"[Method] {method_name} ...")
         trial_results = []
 
         for i in range(3):
-            print(f"    -> Trial {i+1}/3 started.")
+            print(f"    -> Trial {i + 1}/3 started.")
             trial_result = run_method_trial(
                 method_func, graph, args.beta, args.gamma,
                 initial_infected_nodes, args.tol, i, temp_dir
             )
-            print(f"    -> Trial {i+1}/3 finished. Runtime={trial_result['runtime']:.2f}s, "
+            print(f"    -> Trial {i + 1}/3 finished. "
+                  f"Runtime={trial_result['runtime']:.2f}s, "
                   f"Iterations={trial_result['iterations']}")
             trial_results.append(trial_result)
 
@@ -336,20 +335,22 @@ def main(args):
         # compare to MC infection probabilities
         error_metrics = calculate_error_metrics(mc_infection_probs, method_probs)
 
-        method_summary.append({
-            "Method": method_name,
-            "Final S": f"{np.mean(final_s_values):.4f} ± {np.std(final_s_values):.4f}",
-            "Runtime (s)": f"{np.mean(runtimes):.4f} ± {np.std(runtimes):.4f}",
-            "Iterations": f"{np.mean(iterations):.2f} ± {np.std(iterations):.2f}",
-            "Kendall Tau": error_metrics['Kendall Tau'],
-            "Top-K Overlap": error_metrics['Top-K Overlap']
-        })
+        # Instead of appending to a 'method_summary',
+        # directly create a DataFrame for each method.
+        method_data = {
+            "Method": [method_name],
+            "Final S": [f"{np.mean(final_s_values):.4f} ± {np.std(final_s_values):.4f}"],
+            "Runtime (s)": [f"{np.mean(runtimes):.4f} ± {np.std(runtimes):.4f}"],
+            "Iterations": [f"{np.mean(iterations):.2f} ± {np.std(iterations):.2f}"],
+            "Kendall Tau": [error_metrics['Kendall Tau']],
+            "Top-K Overlap": [error_metrics['Top-K Overlap']]
+        }
+        method_df = pd.DataFrame(method_data)
 
-    pd.DataFrame(method_summary).to_csv(
-        os.path.join(output_dir, "method_summary.csv"),
-        index=False
-    )
-    print("[Info] Method comparison saved to method_summary.csv")
+        # Save each method's result in a separate CSV
+        method_filename = f"{method_name.replace(' ', '_')}_summary.csv"
+        method_df.to_csv(os.path.join(output_dir, method_filename), index=False)
+        print(f"[Info] Saved {method_name} results to {method_filename}")
 
     # -------------------- Step 4: Clean up temp files -------------------- #
     print("[Info] Cleaning up temporary files...")
@@ -370,9 +371,9 @@ if __name__ == "__main__":
     parser.add_argument("--gamma", type=float, default=1 / 9, help="Recovery rate")
     parser.add_argument("--tol", type=float, default=1e-3, help="Tolerance for convergence")
     parser.add_argument("--num_simulations", type=int, default=100, help="Number of Monte Carlo simulations")
-    parser.add_argument("--initial_infected", type=int, default=10, help="Number of initially infected nodes")
+    parser.add_argument("--initial_infected", type=int, default=20, help="Number of initially infected nodes")
     parser.add_argument("--data_dir", type=str, default="./data", help="Directory to load real data")
-    parser.add_argument("--file_name", default="com-friendster.top5000.cmty.txt.gz", type=str,
+    parser.add_argument("--file_name", default="p2p-Gnutella31.txt.gz", type=str,
                         help="File name of the real data")
     parser.add_argument("--output_dir", type=str, default="./output", help="Directory to save results")
 
