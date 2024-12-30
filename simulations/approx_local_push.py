@@ -4,10 +4,6 @@ import matplotlib.pyplot as plt
 import heapq
 
 def global_preheat_steps(S, I, R, in_neighbors, beta, gamma, steps=3):
-    """
-    Do 'steps' rounds of global SIR-like updates (exponential approximation),
-    to warm up the state before LocalPush.
-    """
     N = len(S)
     for _ in range(steps):
         S_new = S.copy()
@@ -31,14 +27,9 @@ def global_preheat_steps(S, I, R, in_neighbors, beta, gamma, steps=3):
 
 def approx_conditional_probability_iteration_local_push(
     G, beta, gamma, initial_infected_nodes, tol=0.001,
-    preheat_steps=10, num_substeps=10
+    preheat_steps=3, num_substeps=5
 ):
-    """
-    LocalPush with multi-step update:
-      - First, do 'preheat_steps' global updates to warm up distant nodes.
-      - Then, in each pop from the heap, do 'num_substeps' smaller updates
-        instead of one big step.
-    """
+
     N = G.number_of_nodes()
     S = np.ones(N)
     I = np.zeros(N)
@@ -50,10 +41,8 @@ def approx_conditional_probability_iteration_local_push(
     in_neighbors = {v: list(G.predecessors(v)) for v in G.nodes()}
     out_neighbors = {v: list(G.successors(v)) for v in G.nodes()}
 
-    # 1) 全局预热
     global_preheat_steps(S, I, R, in_neighbors, beta, gamma, steps=preheat_steps)
 
-    # 2) 根据预热状态初始化 residuals
     residuals = {v: 0.0 for v in G.nodes()}
     for u in G.nodes():
         if I[u] > 0:
@@ -68,7 +57,6 @@ def approx_conditional_probability_iteration_local_push(
             in_heap[u] = True
             heapq.heappush(heap, (-residuals[u], u))
 
-    # 将初始 residuals 超过 tol 的节点放到堆中
     for v in G.nodes():
         if residuals[v] > tol:
             in_heap[v] = True
@@ -116,7 +104,6 @@ def approx_conditional_probability_iteration_local_push(
             I_new = I_temp
             R_new = R_temp
 
-            # 如有明显变化，再向邻居推残差
             if (abs(S_new - S[v]) > tol) or (abs(I_new - I[v]) > tol):
                 S[v] = S_new
                 I[v] = I_new

@@ -96,7 +96,7 @@ def main(args):
             results_exp[-1]["recovered"][node] + results_exp[-1]["infected"][node]
             for node in range(num_nodes)
         ])
-        top_k = calculate_top_k_overlap(recovered_prob, mc_infection_prob)
+        top_k = calculate_top_k_overlap(recovered_prob, mc_infection_prob, k=round(0.1*args.nodes))
         quantile = calculate_quantile(final_s, mc_final_s)
         mse = calculate_mse(final_s, mc_final_s)
 
@@ -152,7 +152,7 @@ if __name__ == "__main__":
     parser.add_argument("--num_simulations", type=int, default=20, help="Number of Monte Carlo simulations")
     parser.add_argument("--initial_infected", type=int, default=10, help="Number of initially infected nodes")
     parser.add_argument("--data_dir", type=str, default="./data", help="Directory to load real data")
-    parser.add_argument("--file_name", type=str, default="p2p-Gnutella31.txt.gz", help="File name of the real data")
+    parser.add_argument("--file_name", type=str, default="gplus_combined.txt.gz", help="File name of the real data")
     parser.add_argument("--output_dir", type=str, default="./output", help="Directory to save results")
 
     args = parser.parse_args()
